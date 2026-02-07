@@ -11,6 +11,7 @@ import { conversionQueue } from '@/lib/queue';
 
 const UPLOADS_DIR = path.join(process.cwd(), 'uploads');
 const CONVERTED_DIR = path.join(process.cwd(), 'converted');
+const CLOUDCONVERT_API_KEY = process.env.CLOUDCONVERT_API_KEY;
 
 if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 if (!fs.existsSync(CONVERTED_DIR)) fs.mkdirSync(CONVERTED_DIR, { recursive: true });
@@ -50,7 +51,7 @@ export async function POST(req: NextRequest) {
           break;
         case 'word-to-pdf':
         case 'excel-to-pdf':
-          const resultPath = await convertOfficeToPdf(inputPath, CONVERTED_DIR);
+          const resultPath = await convertOfficeToPdf(inputPath, CONVERTED_DIR, CLOUDCONVERT_API_KEY);
           const convertedExt = path.extname(resultPath);
           outputPath = path.join(CONVERTED_DIR, `${fileId}${convertedExt}`);
           fs.renameSync(resultPath, outputPath);
@@ -68,6 +69,9 @@ export async function POST(req: NextRequest) {
     });
   } catch (error: any) {
     console.error('API Error:', error);
-    return NextResponse.json({ error: error.message || 'Conversion failed' }, { status: 500 });
+    return NextResponse.json({
+        error: error.message || 'Conversion failed',
+        details: 'On shared hosting, Word to PDF requires a CloudConvert API Key. Please add CLOUDCONVERT_API_KEY to your environment.'
+    }, { status: 500 });
   }
 }

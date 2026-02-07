@@ -24,14 +24,23 @@ export async function GET(
     return NextResponse.json({ error: 'File not found' }, { status: 404 });
   }
 
-  // Use streaming for better performance with large files
+  const fileStats = fs.statSync(filePath);
   const fileStream = fs.createReadStream(filePath);
 
-  // @ts-ignore - ReadableStream conversion
-  return new NextResponse(fileStream as any, {
+  // Convert Node.js Readable stream to Web ReadableStream for Next.js 15
+  const stream = new ReadableStream({
+    start(controller) {
+      fileStream.on('data', (chunk) => controller.enqueue(chunk));
+      fileStream.on('end', () => controller.close());
+      fileStream.on('error', (err) => controller.error(err));
+    }
+  });
+
+  return new NextResponse(stream, {
     headers: {
       'Content-Disposition': `attachment; filename="${fileName}"`,
       'Content-Type': 'application/octet-stream',
+      'Content-Length': fileStats.size.toString(),
     },
   });
 }
