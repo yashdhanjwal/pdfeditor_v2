@@ -5,7 +5,7 @@ class ConversionQueue {
   private maxConcurrent = 2;
   private activeCount = 0;
 
-  async add<T>(task: Task): Promise<T> {
+  async add<T>(task: () => Promise<T>): Promise<T> {
     return new Promise((resolve, reject) => {
       this.queue.push({ task, resolve, reject });
       this.process();
