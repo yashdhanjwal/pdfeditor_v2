@@ -47,7 +47,7 @@ export default function Home() {
     "@type": "WebApplication",
     "name": "Free Online Tools by Yash Dhanjwal",
     "description": "Fast, Free & Accurate Document Conversion. Convert PDF to Word, Excel and more.",
-    "url": "https://ft1.yashdhanjwal.com",
+    "url": "https://www.pdfeditor.yashdhanjwal.com",
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "All",
     "author": {
